@@ -1,0 +1,85 @@
+body{
+	background-color: lightgrey;
+}
+
+.row{
+	background-color: inherit;	
+}
+
+.noteBox{
+	min-width: 110px;
+	text-align: left;
+	padding: 20px 35px;
+	background-color: inherit;
+}
+
+.noteTitle{
+	margin-bottom: 0;
+	font-family: 'Libre Baskerville', serif;
+	padding: 5px;
+	text-align: center;
+}
+
+.noteBody{
+	font-family: 'Montserrat', sans-serif;
+	padding: 5px;
+}
+
+a{
+	display: inline;
+	color: black;
+	transition-duration: .7s;
+}
+
+a:hover{
+	text-decoration: none;
+	color: lightgrey;
+}
+
+header{
+	background-color: gray;
+	text-align: center;
+}
+
+span{
+	font-family: 'Bungee';
+	color: lightgrey;
+}
+
+.compose{
+	border-radius: 100%;
+	color: black;
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	font-size: 30px;
+	width: 45px;
+	height: 45px;
+	padding: 0;
+	font-family: 'Bungee Outline', serif;
+}
+
+.h1{
+	font-family: 'Fruktur', sans-serif;
+	font-size: 45px;
+}
+
+h2{
+	font-family: 'Bungee';
+}
+
+#body{height: 200px;}
+#colour{width: 50px;}
+
+form{
+	padding: 1.5rem;
+    margin-right: 0;
+    margin-left: 0;
+    border-width: .2rem;
+}
+
+.dropdown-menu{
+	background-color: grey;
+	font-size: 35px;
+	text-align: center;
+}

@@ -1,0 +1,30 @@
+<%- include("header") -%>
+
+<title>New Note</title>
+
+</head>
+<body>
+
+<header><a class="h1" href="/">Notes</a><span>by Abban</span></header>
+
+
+
+<form action="/" method="post">
+	<h2>Make a new note</h2>
+	<div class="form-group">
+		<label for="title">Enter the title</label>
+		<input type="text" name="title" id="title" class="form-control">
+	</div>
+	<div class="form-group">
+		<label for="body">Enter your text</label>
+		<textarea name="body" id="body" class="form-control"></textarea>
+	</div>
+	<div class="form-group">
+		<label for="color">Select your note color</label>
+		<input type="color" name="color" id="color">
+	</div>
+	<button class="btn btn-primary" type="submit">Make</button>
+</form>
+
+</body>
+</html>

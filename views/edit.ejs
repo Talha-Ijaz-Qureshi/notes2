@@ -1,0 +1,33 @@
+<%- include("header") -%>
+
+<link rel="stylesheet" type="text/css" href="../style.css">
+
+<title>Edit Note</title>
+
+</head>
+<body>
+
+<header><a class="h1" href="/">Notes</a><span>by Abban</span></header>
+
+
+
+<form action="/update" method="post">
+	<h2>Edit your note</h2>
+	<div class="form-group">
+		<label for="title">Enter new title</label>
+		<input type="text" name="title" id="title" class="form-control" value="<%= oldNote.title %>">
+	</div>
+	<div class="form-group">
+		<label for="body">Enter new text</label>
+		<textarea name="body" id="body" class="form-control"><%= oldNote.body %></textarea>
+	</div>
+	<div class="form-group">
+		<label for="color">Select new note color</label>
+		<input type="color" name="color" id="color">
+	</div>
+	<input type="hidden" name="id" value="<%= oldNote._id %>">
+	<button class="btn btn-primary" type="submit">Update</button>
+</form>
+
+</body>
+</html>
