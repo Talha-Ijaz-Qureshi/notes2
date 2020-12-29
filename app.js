@@ -78,11 +78,6 @@ app.post('/update', (req,res)=>{
 	res.redirect('/');
 });
 
-let port = process.env.PORT;
-if (port === null || port === '') {
-	port === 3000;
-};
-
-app.listen(port, ()=>{
+app.listen(3000 || process.env.PORT, ()=>{
 	console.log('Server has started');
 });
