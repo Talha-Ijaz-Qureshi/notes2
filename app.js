@@ -1,67 +1,191 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const ejs = require('ejs');
+const session = require('express-session');
+const passport = require('passport');
+const passportLocalMongoose = require('passport-local-mongoose');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+const findOrCreate = require('mongoose-findorcreate');
 
 const app = express();
-mongoose.connect('mongodb+srv://Abban-admin:yeet123@notes.3dqgm.mongodb.net/notesDB', {useNewUrlParser: true, useUnifiedTopology: true});
+let Introduction = 'Press the + button on the bottom-right corner to make a new note (you cant delete this note, just make a new one to get rid of it.)'
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
-//Notes Model
+app.use(session({
+	secret: process.env.SECRET,
+	resave: false,
+	saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+mongoose.connect(process.env.DATABASE, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.set('useCreateIndex', true);
+
+//Mongoose Models
 
 const noteSchema = {
 	title: String,
 	body: String,
-	color: String
-}
+	color: String,
+	user: String
+};
+
+const userSchema = mongoose.Schema({
+	email: String,
+	username: String,
+	password: String,
+	googleId: String,
+	facebookId: String,
+	twitterId: String
+});
+
+userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
 
 const Note = mongoose.model('Note', noteSchema);
+const User = mongoose.model('User', userSchema);
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
+});
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_SECRET_ID,
+    callbackURL: 'http://localhost:3000/auth/google/notes',
+    userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
+  },
+  function(accessToken, refreshToken, profile, cb) {
+	
+
+    User.findOrCreate({ googleId: profile.id, username: profile.emails[0].value }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+
+passport.use(new FacebookStrategy({
+    clientID: process.env.FB_APP_ID,
+    clientSecret: process.env.FB_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/facebook/notes"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ facebookId: profile.id, username: profile.displayName }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
 
 //Get routes
 
 app.get('/', (req,res)=>{
-	Note.find({}, (err, notes)=>{
-		if (notes !== []) {
-			res.render('home', {notes: notes})
-		} else {
-			res.render('home',{notes: []})
-		}
-		
-	});
+	if (req.isAuthenticated()) {
+		res.redirect('/notes');
+	} else {
+		res.render('homepage');
+	};
 });
 
-app.get('/compose', (req,res)=>{
-	res.render('compose');
+app.get('/notes', (req,res)=>{
+	if (req.isAuthenticated()) {
+		Note.find({user: req.user._id}, (err,foundNotes)=>{
+			if (!err) {
+				if (foundNotes.length === 0) {
+					res.render('home',{notes: [{title: 'Welcome', body: Introduction}], userId: req.user._id});
+					console.log('yeet');
+				} else {
+					res.render('home', {notes: foundNotes, userId: req.user._id})
+				};
+			} else {
+				console.log(err);
+			};
+		});
+	} else {
+		res.redirect('/');
+	};
 });
 
-app.get('/delete/:noteID', (req,res)=>{
-	let noteID = req.params.noteID;
-	Note.deleteOne({_id: noteID}, err=>{});
-	res.redirect('/')
+app.get('/login', (req,res)=>{
+	res.render('login');
+});
+
+app.get('/register', (req,res)=>{
+	res.render('register');
+});
+
+app.get("/auth/google",
+  passport.authenticate('google', { scope: ["profile",'email'] })
+ );
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook')
+ );
+
+app.get('/auth/google/notes', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+
+app.get('/auth/facebook/notes',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+
+app.get('/:userId/compose', (req,res)=>{
+	if (req.isAuthenticated()) {
+		res.render('compose', {userId: req.params.userId});
+	} else {
+		res.redirect('/login')
+	};
+});
+
+app.get('/delete/:noteId', (req,res)=>{
+   let noteId = req.params.noteId;
+   Note.deleteOne({_id: noteId}, err=>{});
 });
 
 app.get('/editNote/:noteID', (req,res)=>{
 	let noteID = req.params.noteID;
-
 	Note.findOne({_id: noteID}, (err, foundNote)=>{
 		res.render('edit', {oldNote: foundNote});
 		console.log(foundNote);
 	});
 	
-})
+});
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
 
 //Post routes
 
 app.post('/', (req,res)=>{
-	let note = new Note({
+	let newNote = new Note({
 		title: req.body.title,
 		body: req.body.body,
-		color: req.body.color
+		color: req.body.color,
+		user: req.body.user
 	});
-	note.save();
+	newNote.save();
 	res.redirect('/');
 });
 

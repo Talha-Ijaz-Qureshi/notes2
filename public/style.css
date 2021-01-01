@@ -44,6 +44,7 @@ header{
 span{
 	font-family: 'Bungee';
 	color: lightgrey;
+	font-size: 20px;
 }
 
 .compose{
@@ -59,7 +60,7 @@ span{
 	font-family: 'Bungee Outline', serif;
 }
 
-.h1{
+h1{
 	font-family: 'Fruktur', sans-serif;
 	font-size: 45px;
 }
