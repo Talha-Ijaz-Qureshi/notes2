@@ -1,16 +1,13 @@
 .row{
 	margin: 65px 10px;
 	padding: 20px 5px;
+	text-align: center;
 }
 
-.form-control{
-	margin: 20px;
+div{
+	text-align: center;
 }
 
 .btn{
 	margin: 32px 5px;
-}
-
-form{
-	padding: 0.5rem;
 }

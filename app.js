@@ -8,10 +8,11 @@ const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+const TwitterStrategy = require('passport-twitter').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
 
 const app = express();
-let Introduction = 'Press the + button on the bottom-right corner to make a new note (you cant delete this note, just make a new one to get rid of it.)'
+let Introduction = 'Press the + button on the bottom-right corner to make a new note.'
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
@@ -92,6 +93,18 @@ passport.use(new FacebookStrategy({
   }
 ));
 
+// passport.use(new TwitterStrategy({
+//     consumerKey: process.env.TW_APP_KEY,
+//     consumerSecret: process.env.TW_SECRET,
+//     callbackURL: "http://127.0.0.1:3000/auth/twitter/notes"
+//   },
+//   function(token, tokenSecret, profile, cb) {
+//     User.findOrCreate({ twitterId: profile.id }, function (err, user) {
+//       return cb(err, user);
+//     });
+//   }
+// ));
+
 //Get routes
 
 app.get('/', (req,res)=>{
@@ -107,10 +120,10 @@ app.get('/notes', (req,res)=>{
 		Note.find({user: req.user._id}, (err,foundNotes)=>{
 			if (!err) {
 				if (foundNotes.length === 0) {
-					res.render('home',{notes: [{title: 'Welcome', body: Introduction}], userId: req.user._id});
+					res.render('home',{notes: [{title: 'Welcome', body: Introduction}], userId: req.user._id, newUser: true});
 					console.log('yeet');
 				} else {
-					res.render('home', {notes: foundNotes, userId: req.user._id})
+					res.render('home', {notes: foundNotes, userId: req.user._id, newUser: false})
 				};
 			} else {
 				console.log(err);
@@ -137,6 +150,10 @@ app.get('/auth/facebook',
   passport.authenticate('facebook')
  );
 
+// app.get('/auth/twitter',
+//   passport.authenticate('twitter')
+//  );
+
 app.get('/auth/google/notes', 
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
@@ -149,6 +166,12 @@ app.get('/auth/facebook/notes',
     res.redirect('/');
   });
 
+// app.get('/auth/twitter/notes',
+//   passport.authenticate('twitter', { failureRedirect: '/login' }),
+//   function(req, res) {
+//     res.redirect('/');
+//   });
+
 app.get('/:userId/compose', (req,res)=>{
 	if (req.isAuthenticated()) {
 		res.render('compose', {userId: req.params.userId});
@@ -160,6 +183,7 @@ app.get('/:userId/compose', (req,res)=>{
 app.get('/delete/:noteId', (req,res)=>{
    let noteId = req.params.noteId;
    Note.deleteOne({_id: noteId}, err=>{});
+   res.redirect('/');
 });
 
 app.get('/editNote/:noteID', (req,res)=>{
