@@ -15,8 +15,18 @@
 		<textarea name="body" id="body" class="form-control"><%= oldNote.body %></textarea>
 	</div>
 	<div class="form-group">
-		<label for="color">Select new note color</label>
-		<input type="color" name="color" id="color">
+		<label for="colour">Select your note color</label>
+		<input type="hidden" name="color" value="#ffffff" id="colour"><br>
+		<button id="color" class="btn btn-lg" style="background-color: #E74C3C; width: 50px; height: 50px;" type="button"></button>
+		<button id="color" class="btn btn-lg" style="background-color: #2980B9; width: 50px; height: 50px;" type="button"></button>
+		<button id="color" class="btn btn-lg" style="background-color: #28B463; width: 50px; height: 50px;" type="button"></button>
+		<button id="color" class="btn btn-lg" style="background-color: #F1C40F; width: 50px; height: 50px;" type="button"></button>
+		<button id="color" class="btn btn-lg" style="background-color: #9B59B6; width: 50px; height: 50px;" type="button"></button>
+		<button id="color" class="btn btn-lg" style="background-color: #F39C12; width: 50px; height: 50px;" type="button"></button>
+		<button id="color" class="btn btn-lg" style="background-color: #ffffff; width: 50px; height: 50px;" type="button"></button>
+		<script type="text/javascript">
+			$(':button').on('click', e=>{$('#colour').attr('value', e.target.style.backgroundColor); $('body').css('background-color', e.target.style.backgroundColor)})
+		</script>
 	</div>
 	<input type="hidden" name="id" value="<%= oldNote._id %>">
 	<button class="btn btn-primary" type="submit">Update</button>
