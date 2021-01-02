@@ -121,7 +121,6 @@ app.get('/notes', (req,res)=>{
 			if (!err) {
 				if (foundNotes.length === 0) {
 					res.render('home',{notes: [{title: 'Welcome', body: Introduction}], userId: req.user._id, newUser: true});
-					console.log('yeet');
 				} else {
 					res.render('home', {notes: foundNotes, userId: req.user._id, newUser: false})
 				};
@@ -181,17 +180,25 @@ app.get('/:userId/compose', (req,res)=>{
 });
 
 app.get('/delete/:noteId', (req,res)=>{
-   let noteId = req.params.noteId;
-   Note.deleteOne({_id: noteId}, err=>{});
-   res.redirect('/');
+	if (req.isAuthenticated()) {
+		let noteId = req.params.noteId;
+   		Note.deleteOne({_id: noteId}, err=>{});
+  		res.redirect('/');	
+	} else {
+		res.redirect('/login')
+	};
+   
 });
 
 app.get('/editNote/:noteID', (req,res)=>{
-	let noteID = req.params.noteID;
-	Note.findOne({_id: noteID}, (err, foundNote)=>{
-		res.render('edit', {oldNote: foundNote});
-		console.log(foundNote);
-	});
+	if (req.isAuthenticated()) {
+		let noteID = req.params.noteID;
+		Note.findOne({_id: noteID}, (err, foundNote)=>{
+			res.render('edit', {oldNote: foundNote});console
+		});
+	} else {
+		res.redirect('/login')
+	};
 	
 });
 
