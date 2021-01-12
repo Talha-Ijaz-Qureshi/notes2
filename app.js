@@ -69,7 +69,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_SECRET_ID,
-    callbackURL: 'http://localhost:3000/auth/google/notes',
+    callbackURL: 'https://nameless-sea-02575.herokuapp.com/auth/google/notes',
     userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
   },
   function(accessToken, refreshToken, profile, cb) {
@@ -84,7 +84,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FB_APP_ID,
     clientSecret: process.env.FB_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/facebook/notes"
+    callbackURL: "https://nameless-sea-02575.herokuapp.com/auth/facebook/notes"
   },
   function(accessToken, refreshToken, profile, cb) {
     User.findOrCreate({ facebookId: profile.id, username: profile.displayName }, function (err, user) {
@@ -233,6 +233,6 @@ app.post('/update', (req,res)=>{
 	res.redirect('/');
 });
 
-app.listen(3000 || process.env.PORT, ()=>{
+app.listen(process.env.PORT, ()=>{
 	console.log('Server has started');
 });
